@@ -5,6 +5,8 @@ from rest_framework.response import Response
 #Task Creation
 from .models import Task
 from .serializers import TaskSerializer
+from rest_framework.exceptions import PermissionDenied
+
 
 # Create your views here.
 class TaskViewSet(viewsets.ModelViewSet):
@@ -25,19 +27,11 @@ class TaskViewSet(viewsets.ModelViewSet):
         #standard users can view only task they are assigned to
         return Task.objects.filter(assigned_to=user)
     
-
     def perform_create(self, serializer):
-        """
-        When creating a task, automatically attach the user 
-        who made the request (decoded from the JWT).
-        """
         if self.request.user.role != 'ADMIN':
-            return Response({
-                "message":"Authorization restricted",
+        # Raising an exception correctly stops the process and returns an error to the client
+            raise PermissionDenied("Authorization restricted")
 
-            },
-            status=status.HTTP_401_UNAUTHORIZED
-        )
+        serializer.save(assigned_by=self.request.user)
 
-        serializer.save(created_by=self.request.user)
     

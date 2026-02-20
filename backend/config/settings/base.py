@@ -42,16 +42,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #Librararies 
     'rest_framework',
     'drf_spectacular',
     'corsheaders',
+    #Apps 
     'apps.users.apps.UsersConfig',
     'apps.tasks.apps.TasksConfig',
     'apps.core.apps.CoreConfig'
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware", #cors middleware imp
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
