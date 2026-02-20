@@ -20,6 +20,17 @@ load_dotenv(BASE_DIR / '.env')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+# Source - https://stackoverflow.com/a/79410709
+# Posted by Lalo19
+# Retrieved 2026-02-20, License - CC BY-SA 4.0
+
+from datetime import timedelta
+
+SIMPLE_JWT = { 
+       'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+       'REFRESH_TOKEN_LIFETIME': timedelta(days=7)
+    }
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -32,6 +43,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 # Application definition
 

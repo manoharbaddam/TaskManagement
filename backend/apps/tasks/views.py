@@ -7,13 +7,13 @@ from .models import Task
 from .serializers import TaskSerializer
 from rest_framework.exceptions import PermissionDenied
 
-from apps.users.permissions import IsOwnerOrAdmin #permissions
+from apps.users.permissions import TaskRolePermission #permissions
 
 
 # Create your views here.
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    permission_classes = [IsOwnerOrAdmin]
+    permission_classes = [TaskRolePermission]
 
     # We don't need to explicitly define permission_classes = [IsAuthenticated] 
     # because we set it as the global default in base.py!

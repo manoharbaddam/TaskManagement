@@ -9,16 +9,25 @@ class IsAdminUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_authenticated and request.user.role == 'ADMIN')
 
-class IsOwnerOrAdmin(permissions.BasePermission):
+class TaskRolePermission(permissions.BasePermission):
     """
-    Object-level permission to only allow owners of an object to edit it.
-    Admins bypass this restriction.
+    Strict RBAC for Tasks:
+    - Admins: Full access (Create, Read, Update, Delete)
+    - Users: Can only view and update tasks assigned to them. Cannot create or delete.
     """
-    message = "You can only view or edit your own tasks." 
 
-    def has_object_permission(self, request, view, obj):
-        # Admins can do whatever they want to any objec
-        if request.user.role == 'ADMIN':
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            return request.user.role == "ADMIN"
+        return True
+    
+    def  has_object_permission(self, request, view, obj):
+        if request.user.role == "ADMIN":
             return True
-        # For standard users, the task's 'assigned_to' must match the user making the request
+        
+        if request.method == "DELETE":
+            return False
+        
         return obj.assigned_to == request.user
+    
+    
