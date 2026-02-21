@@ -25,7 +25,7 @@ api.interceptors.request.use(
 // 3️⃣ Response Interceptor: The "Silent Refresh" Magic - to get access token when it expires
 api.interceptors.response.use(
     (response) => {
-        return reponse;
+        return response;
     },
     async (error) => {
         // Store the original request that failed
