@@ -10,7 +10,8 @@ import {
 import PrivateRoute from "./routes/PrivateRoute";
 
 import Login from "./pages/auth/Login";
-// import Dashboard from "./pages/dashboard/Dashboard";
+import Register from './pages/auth/Register';
+import Dashboard from "./pages/dashboard/Dashboard";
 
 function App() {
     const [count, setCount] = useState(0);
@@ -21,6 +22,7 @@ function App() {
                 <Routes>
                     {/* 🔓 Public Routes (Anyone can visit these) */}
                     <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
 
                     {/* Redirect the root URL to the dashboard automatically */}
                     <Route
@@ -30,7 +32,7 @@ function App() {
 
                     {/* 🔒 Protected Routes (Only logged-in users get past here) */}
                     <Route element={<PrivateRoute />}>
-                        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+                        <Route path="/dashboard" element={<Dashboard />} />
                         {/* Any other private pages (like /profile) will go inside this block! */}
                     </Route>
 
