@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
+from rest_framework.permissions import IsAuthenticated
 
 #for registration
 from .serializers import ResgistrationSerializer
@@ -9,6 +10,10 @@ from .serializers import ResgistrationSerializer
 #for JWT login authentication
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
+
+
+#for users info
+from .serializers import UserListSerializer
 
 User = get_user_model()
 
@@ -41,3 +46,11 @@ class LoginView(TokenObtainPairView):
     """
     serializer_class = CustomTokenObtainPairSerializer
 
+class UserListAPIView(generics.ListAPIView):
+    """
+    API endpoint that allows admins to view all users 
+    so they can populate the 'Assign To' dropdown.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated] # Ensure only logged-in users can see this list
