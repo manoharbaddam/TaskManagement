@@ -202,6 +202,7 @@ const styles = {
         alignItems: "center",
         minHeight: "100vh",
         backgroundColor: "#f4f7f6",
+        color: "#000000",
         padding: "2rem",
     },
     card: {
