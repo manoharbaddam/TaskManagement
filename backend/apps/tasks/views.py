@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.response import Response
 
@@ -14,6 +15,16 @@ from apps.users.permissions import TaskRolePermission #permissions
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = [TaskRolePermission]
+
+    #1. Turn on the Filter, Search, and Ordering engines 
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    # Exact Match Filters (e.g., ?status=DONE)
+    filterset_fields = ['status', 'priority']
+    # Partial Match Search (e.g., ?search=meeting)
+    search_fields = ['title', 'description']
+    #Sorting (e.g., ?ordering=-due_date)
+    ordering_fields = ['due_date', 'created_at']
+    ordering = ['-created_at']
 
     # We don't need to explicitly define permission_classes = [IsAuthenticated] 
     # because we set it as the global default in base.py!

@@ -13,13 +13,26 @@ const Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+
     useEffect(() => {
-        fetchTasks();
-    }, []);
+        const delaySearch = setTimeout(() => {
+            fetchTasks();
+        }, 300); 
+
+        return () => clearTimeout(delaySearch);
+    }, [searchQuery, statusFilter]);
 
     const fetchTasks = async () => {
+        setIsLoading(true);
         try {
-            const response = await api.get("api/v1/tasks/");
+            const response = await api.get("api/v1/tasks/",{
+                params: {
+                    search: searchQuery || undefined,
+                    status: statusFilter || undefined,
+                }
+            });
             setTasks(response.data.results || response.data);
             setError("");
         } catch (err) {
@@ -94,6 +107,31 @@ const Dashboard = () => {
                             + New Task
                         </button>
                     )}
+                </div>
+
+                <div style={styles.filterBar}>
+                    <div style={styles.searchBox}>
+                        <input 
+                            type="text" 
+                            placeholder="Search tasks..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={styles.searchInput}
+                        />
+                        <button onClick={fetchTasks} style={styles.searchBtn}>Search</button>
+                    </div>
+
+                    <select 
+                        value={statusFilter} 
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        style={styles.filterSelect}
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="ASSIGNED">Assigned</option>
+                        <option value="ACCEPTED">Accepted</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="COMPLETED">Completed</option>
+                    </select>
                 </div>
 
                 {error && <div style={styles.errorBox}>{error}</div>}
@@ -349,6 +387,11 @@ const styles = {
     },
     assigneeText: { fontSize: '0.85rem', color: '#475569', marginTop: '0.5rem', marginBottom: '0.5rem' },
     dateText :{fontSize: '0.85rem', color: '#475569', marginTop: '0.5rem', marginBottom: '0.5rem' },
+    filterBar: { display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' },
+    searchBox: { display: 'flex', gap: '0.5rem', flex: 1, minWidth: '300px' },
+    searchInput: { flex: 1, padding: '0.75rem', borderRadius: '4px', border: '1px solid #ccc' },
+    searchBtn: { padding: '0.75rem 1.5rem', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' },
+    filterSelect: { padding: '0.75rem', borderRadius: '4px', border: '1px solid #ccc', minWidth: '150px' },
 };
 
 export default Dashboard;
