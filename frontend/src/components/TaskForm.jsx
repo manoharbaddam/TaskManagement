@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 
-const TaskForm = ({ onClose, onSuccess }) => {
+const TaskForm = ({task, onClose, onSuccess }) => {
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -23,11 +24,21 @@ const TaskForm = ({ onClose, onSuccess }) => {
                 setUsers(response.data.results || response.data);
             } catch (err) {
                 console.error("Failed to fetch users for the dropdown:", err);
-                setError("Could not load user list. Please try again.");
             }
         };
         fetchUsers();
-    }, []);
+        if (task) {
+            setFormData({
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                priority: task.priority,
+                // Slice the date in case Django sent it with timestamps (YYYY-MM-DD)
+                due_date: task.due_date ? task.due_date.substring(0, 10) : '', 
+                assigned_to: task.assigned_to 
+            });
+        }
+    }, [task]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,24 +50,26 @@ const TaskForm = ({ onClose, onSuccess }) => {
         setError("");
 
         try {
-            await api.post("/api/v1/tasks/", formData);
+            if (task) {
+                // Update existing task
+                await api.put(`/api/v1/tasks/${task.id}/`, formData);
+            } else {
+                // Create new task
+                await api.post('/api/v1/tasks/', formData);
+            }
             onSuccess();
             onClose();
         } catch (err) {
-            console.error("Task Creation Error:", err);
+            console.error("Form Submit Error:", err);
             if (
                 err.response &&
                 err.response.data &&
                 err.response.data.message
             ) {
                 // Formatting the Django validation errors into a readable string
-                const errorObj = err.response.data.message;
-                const errorMsg = Object.keys(errorObj)
-                    .map((key) => `${key}: ${errorObj[key]}`)
-                    .join(" | ");
-                setError(errorMsg);
+                setError(JSON.stringify(err.response.data));
             } else {
-                setError("Failed to create task. Check the console.");
+                setError("Failed to save task. Check the console.");
             }
         } finally {
             setIsLoading(true);

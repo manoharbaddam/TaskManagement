@@ -11,6 +11,7 @@ const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTask, setEditingTask] = useState(null);
 
     useEffect(() => {
         fetchTasks();
@@ -84,7 +85,10 @@ const Dashboard = () => {
                     {/* Only show the 'Create Task' button if the user is an ADMIN */}
                     {user?.role === "ADMIN" && (
                         <button
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={() => {
+                                setEditingTask(null);
+                                setIsModalOpen(true);
+                            }}
                             style={styles.createBtn}
                         >
                             + New Task
@@ -169,7 +173,11 @@ const Dashboard = () => {
                                 {user?.role === "ADMIN" && (
                                     <div style={styles.adminControls}>
                                         {/* We will wire up the Edit button next! */}
-                                        <button style={styles.editBtn}>
+                                        <button onClick={() => {
+                                                setEditingTask(task); 
+                                                setIsModalOpen(true);  
+                                        }}
+                                        style={styles.editBtn}>
                                             Edit Details
                                         </button>
                                         <button
@@ -189,7 +197,12 @@ const Dashboard = () => {
             </main>
             {isModalOpen && (
                 <TaskForm
-                    onClose={() => setIsModalOpen(false)}
+                    task={editingTask}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        setEditingTask(null);
+                    }}
+
                     onSuccess={fetchTasks}
                 />
             )}
