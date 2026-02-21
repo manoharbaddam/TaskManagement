@@ -50,6 +50,17 @@ const Dashboard = () => {
         }
     };
 
+    const handleDelete = async (taskId) =>{
+        if(!window.confirm("Are you sure you want to delete this task?")) return ;
+        try{
+            await api.delete(`/api/v1/tasks/${taskId}/`);
+            fetchTasks();
+        }catch(err){
+            console.error("Error deleting task: ",err);
+            alert("Failed to delete task.You might not have permission.");
+        }
+    };
+
     return (
         <div style={styles.container}>
             {/* --NavBar Section */}
@@ -94,7 +105,11 @@ const Dashboard = () => {
                         {tasks.map((task) => (
                             <div key={task.id} style={styles.taskCard}>
                                 <h3>{task.title}</h3>
+                                <p style={styles.assigneeText}>
+                                    👤 Assigned to: <strong>{task.assignee_name}</strong>
+                                </p>
                                 <p style={styles.desc}>{task.description}</p>
+                                
 
                                 <div style={styles.meta}>
                                     <select
@@ -318,6 +333,7 @@ const styles = {
         color: "#b91c1c",
         fontWeight: "bold",
     },
+    assigneeText: { fontSize: '0.85rem', color: '#475569', marginTop: '0.5rem', marginBottom: '0.5rem' },
 };
 
 export default Dashboard;
