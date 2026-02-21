@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/axios";
+import TaskForm from "../../components/TaskForm";
 
 const Dashboard = () => {
     const { user, logout } = useAuth(); // Grab the user object and logout function
@@ -9,6 +10,7 @@ const Dashboard = () => {
     const [tasks, setTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         fetchTasks();
@@ -49,7 +51,12 @@ const Dashboard = () => {
                     <h1>Your Tasks</h1>
                     {/* Only show the 'Create Task' button if the user is an ADMIN */}
                     {user?.role === "ADMIN" && (
-                        <button style={styles.createBtn}>+ New Task</button>
+                        <button
+                            onClick={() => setIsModalOpen(true)} 
+                            style={styles.createBtn}
+                        >
+                            + New Task
+                        </button>
                     )}
                 </div>
 
@@ -80,6 +87,12 @@ const Dashboard = () => {
                     </div>
                 )}
             </main>
+            {isModalOpen && (
+                <TaskForm 
+                    onClose={() => setIsModalOpen(false)} 
+                    onSuccess={fetchTasks} 
+                />
+            )}
         </div>
     );
 };
