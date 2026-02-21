@@ -1,22 +1,33 @@
 from .base import *
 import os
+from dotenv import load_dotenv
+from urllib.parse import urlparse, parse_qsl
+
+load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# Allowed hosts must be strictly defined in production
-# Example env var: ALLOWED_HOSTS=api.yourdomain.com,www.yourdomain.com
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+# Safely parse ALLOWED_HOSTS (Ignores empty strings)
+hosts_env = os.getenv('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [host.strip() for host in hosts_env.split(',') if host.strip()]
 
-# Production Database (PostgreSQL)
+# Safely parse CORS_ALLOWED_ORIGINS (Ignores empty strings)
+cors_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
+
+# Neon PostgreSQL Database Connection
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DATABASE_NAME"),
-        'USER': os.getenv("DATABASE_USER"),
-        'PASSWORD': os.getenv("DATABASE_PASSWORD"),
-        'HOST': os.getenv("DATABASE_HOST"),
-        'PORT': os.getenv("DATABASE_PORT", "5432"),
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+        'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
     }
 }
 
@@ -40,14 +51,6 @@ SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 # Prevents the site from being embedded in iframes (clickjacking protection)
 X_FRAME_OPTIONS = 'DENY'
-
-# ==========================================
-# CORS & STATIC FILES
-# ==========================================
-
-# Only allow specific frontend domains to make requests to your API
-# Example env var: CORS_ALLOWED_ORIGINS=https://yourfrontend.com,https://www.yourfrontend.com
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 
 # Where static files will be collected when you run `python manage.py collectstatic`
 STATIC_ROOT = BASE_DIR / 'staticfiles'
