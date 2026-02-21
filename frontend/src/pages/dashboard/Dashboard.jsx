@@ -29,6 +29,27 @@ const Dashboard = () => {
         }
     };
 
+    const handleStatusChange = async (taskId, newStatus) => {
+        try {
+            await api.patch(`/api/v1/tasks/${taskId}/`, { status: newStatus });
+            fetchTasks();
+        } catch (err) {
+            console.err("Error updating status:", err);
+            alert("Failed to delete task. You might not have permission.");
+        }
+    };
+
+    const handlePriorityChange = async (taskId,newPriority) =>{
+        try{
+            await api.patch(`/api/v1/tasks/${taskId}/`,{ priority:newPriority });
+            fetchTasks();
+        }
+        catch(err){
+            console.err("Error updating priority: ",err);
+            alert("Failed to delete task. You might not have permission.");
+        }
+    };
+
     return (
         <div style={styles.container}>
             {/* --NavBar Section */}
@@ -52,7 +73,7 @@ const Dashboard = () => {
                     {/* Only show the 'Create Task' button if the user is an ADMIN */}
                     {user?.role === "ADMIN" && (
                         <button
-                            onClick={() => setIsModalOpen(true)} 
+                            onClick={() => setIsModalOpen(true)}
                             style={styles.createBtn}
                         >
                             + New Task
@@ -74,23 +95,87 @@ const Dashboard = () => {
                             <div key={task.id} style={styles.taskCard}>
                                 <h3>{task.title}</h3>
                                 <p style={styles.desc}>{task.description}</p>
+
                                 <div style={styles.meta}>
-                                    <span style={styles.status(task.status)}>
-                                        {task.status}
-                                    </span>
-                                    <span style={styles.priority}>
-                                        {task.priority} Priority
-                                    </span>
+                                    <select
+                                        value={task.status}
+                                        onChange={(e) =>
+                                            handleStatusChange(
+                                                task.id,
+                                                e.target.value,
+                                            )
+                                        }
+                                        style={styles.statusSelect(task.status)}
+                                    >
+                                        <option value="ASSIGNED">
+                                            Assigned
+                                        </option>
+                                        <option value="ACCEPTED">
+                                            Accepted
+                                        </option>
+                                        <option value="IN_PROGRESS">
+                                            In Progress
+                                        </option>
+                                        <option value="COMPLETED">
+                                            Completed
+                                        </option>
+                                    </select>
+
+                                    {user?.role === "ADMIN" ? 
+                                        <span style={styles.priority}>
+                                            <select
+                                                value={task.priority}
+                                                onChange={(e) =>
+                                                    handlePriorityChange(
+                                                        task.id,
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                style={styles.statusSelect(
+                                                    task.priority,
+                                                )}
+                                            >
+                                                <option value="LOW">Low</option>
+                                                <option value="MEDIUM">
+                                                    Medium
+                                                </option>
+                                                <option value="HIGH">
+                                                    High
+                                                </option>
+                                            </select>
+                                        </span>
+                                     : 
+                                        <span style={styles.priority}>
+                                            {task.priority} Priority
+                                        </span>
+                                    }
                                 </div>
+                                {/* 🛡️ ADMIN ONLY CONTROLS */}
+                                {user?.role === "ADMIN" && (
+                                    <div style={styles.adminControls}>
+                                        {/* We will wire up the Edit button next! */}
+                                        <button style={styles.editBtn}>
+                                            Edit Details
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(task.id)
+                                            }
+                                            style={styles.deleteBtn}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
                 )}
             </main>
             {isModalOpen && (
-                <TaskForm 
-                    onClose={() => setIsModalOpen(false)} 
-                    onSuccess={fetchTasks} 
+                <TaskForm
+                    onClose={() => setIsModalOpen(false)}
+                    onSuccess={fetchTasks}
                 />
             )}
         </div>
@@ -193,14 +278,46 @@ const styles = {
                 : status === "IN_PROGRESS"
                   ? "#fef3c7"
                   : "#e0e7ff",
-        color:
-            status === "DONE"
-                ? "#065f46"
-                : status === "IN_PROGRESS"
-                  ? "#92400e"
-                  : "#3730a3",
+        color: status === "COMPLETED" ? "#145500" : "#3730a3",
     }),
+    statusSelect: (status) => ({
+        padding: "0.25rem 0.5rem",
+        borderRadius: "4px",
+        fontSize: "0.8rem",
+        fontWeight: "bold",
+        border: "1px solid #cbd5e1",
+        cursor: "pointer",
+        backgroundColor: "#ffffff",
+        color: status === "COMPLETED" ? "#14bf3c" : "#3730a3",
+    }),
+    adminControls: {
+        display: "flex",
+        gap: "0.5rem",
+        marginTop: "1rem",
+        paddingTop: "1rem",
+        borderTop: "1px solid #e2e8f0",
+    },
     priority: { fontSize: "0.8rem", color: "#64748b", fontWeight: "500" },
+    editBtn: {
+        flex: 1,
+        padding: "0.5rem",
+        backgroundColor: "#e2e8f0",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+        color: "#334155",
+        fontWeight: "bold",
+    },
+    deleteBtn: {
+        flex: 1,
+        padding: "0.5rem",
+        backgroundColor: "#fee2e2",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+        color: "#b91c1c",
+        fontWeight: "bold",
+    },
 };
 
 export default Dashboard;
