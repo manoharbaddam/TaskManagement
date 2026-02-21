@@ -80,7 +80,7 @@ const TaskForm = ({task, onClose, onSuccess }) => {
         <div style={styles.overlay}>
             <div style={styles.modal}>
                 <div style={styles.header}>
-                    <h3>Create New Task</h3>
+                    <h3>{task ? 'Edit Task' : 'Create New Task'}</h3>
                     <button onClick={onClose} style={styles.closeBtn}>
                         &times;
                     </button>
@@ -174,7 +174,7 @@ const TaskForm = ({task, onClose, onSuccess }) => {
                             disabled={isLoading}
                             style={styles.submitBtn}
                         >
-                            {isLoading ? "Saving..." : "Create Task"}
+                            {isLoading ? 'Saving...' : (task ? 'Save Changes' : 'Create Task')}
                         </button>
                     </div>
                 </form>

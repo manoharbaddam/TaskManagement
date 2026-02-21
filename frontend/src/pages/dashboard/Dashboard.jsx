@@ -113,6 +113,7 @@ const Dashboard = () => {
                                     👤 Assigned to: <strong>{task.assignee_name}</strong>
                                 </p>
                                 <p style={styles.desc}>{task.description}</p>
+                                <p style={styles.dateText}>Due Date: {task.due_date}</p>
                                 
 
                                 <div style={styles.meta}>
@@ -347,6 +348,7 @@ const styles = {
         fontWeight: "bold",
     },
     assigneeText: { fontSize: '0.85rem', color: '#475569', marginTop: '0.5rem', marginBottom: '0.5rem' },
+    dateText :{fontSize: '0.85rem', color: '#475569', marginTop: '0.5rem', marginBottom: '0.5rem' },
 };
 
 export default Dashboard;
